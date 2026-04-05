@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-4 text-primary">🎉 Parties</h3>
+
+  <!-- Party Form -->
+  <div class="card shadow-sm p-3 mb-4">
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      <div class="col-md-8">
+        {{ form.as_p }}
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-success w-100" type="submit">➕ Add Party</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Party List -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white fw-bold">
+      📋 Party List
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for p in parties %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ p.name }}
+          <span class="badge bg-primary rounded-pill">ID: {{ p.id }}</span>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">⚠️ No parties found</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

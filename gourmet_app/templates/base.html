@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Gourmet Agency</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .content-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        background-color: #fff;
+        margin-top: 20px;
+      }
+      .navbar-brand {
+        font-weight: bold;
+        font-size: 1.3rem;
+      }
+      .navbar-nav .nav-link {
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">🍽️ Das Cola</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- Left menu -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'company_list' %}">🏢 Companies</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'product_list' %}">📦 Products</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'party_list' %}">👥 Parties</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'quick_sale' %}">⚡ Quick Sale</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'add_expense' %}">➕ Add Expense</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'grand_summary' %}">🧾 Grand Summary</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'stock_dashboard' %}">📦 Stock Report</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'sales_report' %}">📊 Sales Report</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'add_purchase' %}">📊 Add Purchase</a></li>
+          </ul>
+
+          <!-- Right menu -->
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link text-danger fw-bold" href="{% url 'logout' %}">🚪 Logout</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link text-success fw-bold" href="{% url 'login' %}">🔑 Login</a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content in Card -->
+    <div class="container">
+      <div class="content-card">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

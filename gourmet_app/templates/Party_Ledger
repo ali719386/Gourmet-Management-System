@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    
+    <!-- Header -->
+    <div class="mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">📒 Party Ledger - {{ party.name }}</h2>
+        <p class="text-gray-500">Balance Sheet & Transactions</p>
+    </div>
+
+    <!-- Totals -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="bg-blue-100 p-4 rounded-xl shadow">
+            <p class="text-gray-600">Total Sales</p>
+            <h3 class="text-xl font-bold text-blue-800">Rs. {{ total_sales }}</h3>
+        </div>
+        <div class="bg-green-100 p-4 rounded-xl shadow">
+            <p class="text-gray-600">Total Paid</p>
+            <h3 class="text-xl font-bold text-green-800">Rs. {{ total_paid }}</h3>
+        </div>
+        <div class="bg-red-100 p-4 rounded-xl shadow">
+            <p class="text-gray-600">Balance</p>
+            <h3 class="text-xl font-bold text-red-800">Rs. {{ balance }}</h3>
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="mb-10">
+        <h3 class="text-xl font-semibold mb-3">🛒 Sales</h3>
+        <table class="w-full table-auto border border-gray-200 shadow rounded-xl">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-2">Date</th>
+                    <th class="p-2">Product</th>
+                    <th class="p-2">Qty</th>
+                    <th class="p-2">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                <tr class="border-t">
+                    <td class="p-2">{{ sale.date }}</td>
+                    <td class="p-2">{{ sale.product.name }} ({{ sale.product.size }})</td>
+                    <td class="p-2">{{ sale.qty }}</td>
+                    <td class="p-2">Rs. {{ sale.amount }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-gray-500 p-2">No Sales</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Product Wise Summary -->
+    <div class="mb-10">
+        <h3 class="text-xl font-semibold mb-3">📦 Product-wise Sales Summary</h3>
+        <table class="w-full table-auto border border-gray-200 shadow rounded-xl">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-2">Product</th>
+                    <th class="p-2">Total Qty</th>
+                    <th class="p-2">Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sales_summary %}
+                <tr class="border-t">
+                    <td class="p-2">{{ item.product__name }} ({{ item.product__size }})</td>
+                    <td class="p-2">{{ item.total_qty }}</td>
+                    <td class="p-2">Rs. {{ item.total_amount }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-gray-500 p-2">No Data</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Payments -->
+    <div class="mb-10">
+        <h3 class="text-xl font-semibold mb-3">💵 Payments</h3>
+        <table class="w-full table-auto border border-gray-200 shadow rounded-xl mb-4">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-2">Date</th>
+                    <th class="p-2">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pay in payments %}
+                <tr class="border-t">
+                    <td class="p-2">{{ pay.date }}</td>
+                    <td class="p-2">Rs. {{ pay.amount }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" class="text-center text-gray-500 p-2">No Payments</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Add Payment Form -->
+        <form method="post" class="bg-gray-50 p-4 rounded-xl shadow">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium">Amount</label>
+                    <input type="number" name="amount" class="w-full border rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Date</label>
+                    <input type="date" name="date" class="w-full border rounded-lg p-2">
+                </div>
+            </div>
+            <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg">Add Payment</button>
+        </form>
+    </div>
+
+    <!-- Transactions -->
+    <div class="mb-10">
+        <h3 class="text-xl font-semibold mb-3">🔄 Transactions</h3>
+        <table class="w-full table-auto border border-gray-200 shadow rounded-xl">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-2">Date</th>
+                    <th class="p-2">Type</th>
+                    <th class="p-2">Amount</th>
+                    <th class="p-2">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tr in transactions %}
+                <tr class="border-t">
+                    <td class="p-2">{{ tr.date }}</td>
+                    <td class="p-2">{{ tr.get_type_display }}</td>
+                    <td class="p-2">Rs. {{ tr.amount }}</td>
+                    <td class="p-2">{{ tr.description }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-gray-500 p-2">No Transactions</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

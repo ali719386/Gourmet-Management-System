@@ -1,0 +1,263 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Summary</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap Icons (optional) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto p-6 space-y-10">
+
+  <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight text-center mb-6">📊 Grand Summary Dashboard</h2>
+
+  <!-- 🟩 CHARTS CARD -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2">
+      <i class="bi bi-bar-chart-line"></i> Overview Charts
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <canvas id="salesProfitChart" height="200"></canvas>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <canvas id="companyPaymentChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🟩 STOCK TABLE -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-700 mb-4">Stock Summary</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-600">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Product</th>
+            <th class="px-4 py-2">Rate</th>
+            <th class="px-4 py-2">Stock In Hand</th>
+            <th class="px-4 py-2">Total Amount</th>
+            <th class="px-4 py-2">Sold Qty</th>
+            <th class="px-4 py-2">Profit (Sold)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in stocks %}
+          <tr class="border-b hover:bg-gray-50">
+            <td class="px-4 py-2">
+  {{ s.product_name }}
+  {% if s.product_size %} ({{ s.product_size }}){% endif %}
+</td>
+            <td class="px-4 py-2">{{ s.rate }}</td>
+            <td class="px-4 py-2">{{ s.stock_in_hand }}</td>
+            <td class="px-4 py-2">{{ s.total_price }}</td>
+            <td class="px-4 py-2">{{ s.sold_qty }}</td>
+            <td class="px-4 py-2">{{ s.profit_per_product }}</td>
+          </tr>
+          {% endfor %}
+          <tr class="bg-gray-100 font-bold">
+            <td colspan="3" class="px-4 py-2 text-right">Grand Total (Stock)</td>
+            <td class="px-4 py-2">{{ grand_total_stock }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🟩 FINANCIAL SUMMARY -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h4 class="text-xl font-bold text-gray-700 mb-4">Financial Summary</h4>
+    <table class="min-w-full text-sm text-left text-gray-600">
+      <tr class="border-b">
+        <th class="px-4 py-2">Total Profit (Sold Items)</th>
+        <td class="px-4 py-2">{{ total_profit_sold_items }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Total Expense</th>
+        <td class="px-4 py-2">{{ total_expense }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Grand Profit (After Expense)</th>
+        <td class="px-4 py-2 font-bold">{{ grand_profit }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Total Investment (Payments Made to Companies)</th>
+        <td class="px-4 py-2 font-bold">{{ total_investment }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 🟩 COMPANY SUMMARY -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h4 class="text-xl font-bold text-gray-700 mb-4">Company Summary</h4>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-600">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Company</th>
+            <th class="px-4 py-2">Total Purchase</th>
+            <th class="px-4 py-2">Total Payment Made</th>
+            <th class="px-4 py-2">Pending Payment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in company_summary %}
+          <tr class="border-b hover:bg-gray-50">
+            <td class="px-4 py-2">{{ c.company }}</td>
+            <td class="px-4 py-2">{{ c.total_purchase }}</td>
+            <td class="px-4 py-2">{{ c.total_payment }}</td>
+            <td class="px-4 py-2">{{ c.pending_payment }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🟩 INVESTMENT / NET WORTH SUMMARY -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h4 class="text-xl font-bold text-gray-700 mb-4">Investment / Net Worth</h4>
+    <table class="min-w-full text-sm text-left text-gray-600">
+      <tr class="border-b">
+        <th class="px-4 py-2">Initial Investment</th>
+        <td class="px-4 py-2">{{ initial_investment }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Total Paid to Companies</th>
+        <td class="px-4 py-2">{{ total_investment }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Total Pending Payment</th>
+        <td class="px-4 py-2">{{ total_pending_payment }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Current Stock Worth</th>
+        <td class="px-4 py-2">{{ grand_total_stock }}</td>
+      </tr>
+      <tr class="border-b">
+        <th class="px-4 py-2">Grand Profit (After Expense)</th>
+        <td class="px-4 py-2">{{ grand_profit }}</td>
+      </tr>
+      <tr class="bg-gray-100 font-bold">
+        <th class="px-4 py-2">Net Worth (All Combined)</th>
+        <td class="px-4 py-2">{{ net_worth }}</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ================= CHARTS SCRIPT ================= -->
+<script>
+  // === Data from Django Context ===
+  const productNames = [
+    {% for s in stocks %}
+      '{{ s.product_name }}{% if s.product_size %} ({{ s.product_size }}){% endif %}',
+    {% endfor %}
+  ];
+
+  const salesAmounts = [
+    {% for s in stocks %}
+      {{ s.sold_qty|default:0 }},
+    {% endfor %}
+  ];
+
+  const profits = [
+    {% for s in stocks %}
+      {{ s.profit_per_product|default:0 }},
+    {% endfor %}
+  ];
+
+  const companyNames = [
+    {% for c in company_summary %}
+      '{{ c.company }}',
+    {% endfor %}
+  ];
+
+  const paymentsMade = [
+    {% for c in company_summary %}
+      {{ c.total_payment|default:0 }},
+    {% endfor %}
+  ];
+
+  const pendingPayments = [
+    {% for c in company_summary %}
+      {{ c.pending_payment|default:0 }},
+    {% endfor %}
+  ];
+
+  // === Bar Chart: Sales vs Profit ===
+  const ctx1 = document.getElementById('salesProfitChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: productNames,
+      datasets: [
+        {
+          label: 'Sold Qty',
+          data: salesAmounts,
+          backgroundColor: 'rgba(59,130,246,0.6)' // blue
+        },
+        {
+          label: 'Profit (Sold)',
+          data: profits,
+          backgroundColor: 'rgba(16,185,129,0.6)' // green
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Product Sales & Profit'
+        },
+        legend: {
+          position: 'top'
+        }
+      },
+      scales: {
+        x: { stacked: false },
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  // === Pie Chart: Company Payment vs Pending ===
+  const totalPaid = paymentsMade.reduce((a,b)=>a+b,0);
+  const totalPending = pendingPayments.reduce((a,b)=>a+b,0);
+
+  const ctx2 = document.getElementById('companyPaymentChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'pie',
+    data: {
+      labels: ['Total Paid', 'Total Pending'],
+      datasets: [{
+        data: [totalPaid, totalPending],
+        backgroundColor: [
+          'rgba(59,130,246,0.6)', // blue
+          'rgba(239,68,68,0.6)'   // red
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Company Payments Overview'
+        }
+      }
+    }
+  });
+</script>

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Quick Sale</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label>Party</label>
+    <select name="party" class="form-select">
+      <option value="">Select</option>
+      {% for pa in parties %}
+        <option value="{{ pa.pk }}">{{ pa.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Product Table -->
+  <table class="table table-bordered" id="productTable">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Rate</th>
+        <th>Discount</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <select name="product" class="form-select">
+            <option value="">Select</option>
+            {% for pr in products %}
+              <option value="{{ pr.pk }}">{{ pr }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td><input type="number" name="qty" class="form-control qty" value="1"></td>
+        <td><input type="number" name="rate" class="form-control rate" value="0"></td>
+        <td><input type="number" name="discount" class="form-control discount" value="0"></td>
+        <td class="line-total">0</td>
+        <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button type="button" class="btn btn-primary mb-3" id="addRow">➕ Add Product</button>
+
+  <!-- Grand Total -->
+  <div class="mb-3 text-end">
+    <h5>Grand Total: Rs <span id="grandTotal">0</span></h5>
+  </div>
+
+  <button class="btn btn-success" type="submit">Make Sale & Generate PDF</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const tableBody = document.querySelector("#productTable tbody");
+  const addRowBtn = document.getElementById("addRow");
+  const grandTotalEl = document.getElementById("grandTotal");
+
+  function updateTotals() {
+    let grandTotal = 0;
+    tableBody.querySelectorAll("tr").forEach(row => {
+      let qty = parseFloat(row.querySelector(".qty").value) || 0;
+      let rate = parseFloat(row.querySelector(".rate").value) || 0;
+      let discount = parseFloat(row.querySelector(".discount").value) || 0;
+      let total = (qty * rate) - discount;
+      row.querySelector(".line-total").innerText = total.toFixed(2);
+      grandTotal += total;
+    });
+    grandTotalEl.innerText = grandTotal.toFixed(2);
+  }
+
+  // Add row
+  addRowBtn.addEventListener("click", () => {
+    let newRow = tableBody.querySelector("tr").cloneNode(true);
+    newRow.querySelectorAll("input").forEach(input => input.value = "");
+    newRow.querySelector(".line-total").innerText = "0";
+    tableBody.appendChild(newRow);
+  });
+
+  // Remove row
+  tableBody.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-row") && tableBody.querySelectorAll("tr").length > 1) {
+      e.target.closest("tr").remove();
+      updateTotals();
+    }
+  });
+
+  // Update totals when values change
+  tableBody.addEventListener("input", updateTotals);
+});
+</script>
+{% endblock %}

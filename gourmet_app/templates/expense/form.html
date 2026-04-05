@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Manager · Modern Animated</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <style>
+    body { background: linear-gradient(135deg, #021a09ff, #ecfeff); }
+    .card { backdrop-filter: blur(12px); }
+    .shadow-3xl { box-shadow: 0 30px 80px rgba(0,0,0,.15); }
+    .animate-fade-up { animation: fadeUp 0.8s ease both; }
+    @keyframes fadeUp { from {opacity:0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+    .ripple { position: relative; overflow: hidden; }
+    .ripple span { position:absolute; border-radius:50%; transform:translate(-50%,-50%); animation:ripple .7s linear; background:rgba(255,255,255,.6); width:0; height:0; }
+    @keyframes ripple { to { width:400px; height:400px; opacity:0; } }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+  <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-up">
+
+    <!-- Add Expense -->
+    <div class="col-span-1">
+      <div class="card bg-white/70 rounded-3xl shadow-3xl border overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-5">
+          <h3 class="text-xl font-bold">➕ Add Expense</h3>
+        </div>
+        <div class="p-6">
+          <form method="post" class="space-y-5" id="expenseForm">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="ripple relative w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg">
+              Add Expense
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expense List -->
+    <div class="col-span-2">
+      <div class="card bg-white/70 rounded-3xl shadow-3xl border overflow-hidden hover:scale-[1.01] transition-transform duration-300">
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-6 py-5 flex justify-between items-center">
+          <h3 class="text-xl font-bold">💰 Expense List</h3>
+          <span class="bg-slate-700/60 px-3 py-1 rounded-full text-sm font-semibold">Total Records: {{ expenses|length }}</span>
+        </div>
+        <div class="p-6 overflow-x-auto">
+          <table class="min-w-full text-sm divide-y divide-gray-200">
+            <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+              <tr>
+                <th class="px-5 py-3 text-left">Date</th>
+                <th class="px-5 py-3 text-left">Description</th>
+                <th class="px-5 py-3 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              {% for e in expenses %}
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-5 py-3 text-gray-800">{{ e.date }}</td>
+                <td class="px-5 py-3 text-gray-600">{{ e.description }}</td>
+                <td class="px-5 py-3 text-right font-semibold text-gray-900">Rs {{ e.amount }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="px-5 py-8 text-center text-gray-400 italic">🚫 No expenses yet</td>
+              </tr>
+              {% endfor %}
+              {% if expenses %}
+              <tr class="bg-gray-50 font-bold text-gray-900">
+                <td colspan="2" class="px-5 py-3 text-right">Grand Total:</td>
+                <td class="px-5 py-3 text-right text-green-600">Rs {{ total_expenses }}</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.querySelectorAll('.ripple').forEach(btn => {
+      btn.addEventListener('click', function(e){
+        const span=document.createElement('span');
+        const rect=this.getBoundingClientRect();
+        span.style.left=(e.clientX-rect.left)+'px';
+        span.style.top=(e.clientY-rect.top)+'px';
+        this.appendChild(span);
+        setTimeout(()=>span.remove(),700);
+      });
+    });
+  </script>
+</body>
+</html>

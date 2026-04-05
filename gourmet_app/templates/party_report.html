@@ -1,0 +1,68 @@
+{% load static %}
+<div class="container mt-4">
+
+  <!-- Page Header + Search -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-primary">🧾 Party Report</h4>
+    <form method="get" class="d-flex">
+      <input type="text" name="search" value="{{ query }}" class="form-control me-2" placeholder="Search Party Name">
+      <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+  </div>
+  <hr>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered table-striped align-middle text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Party</th>
+          <th>Date</th>
+          <th class="text-start">Product</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>Amount</th>
+          <th>Stock</th>
+          <th>Paid</th>
+          <th>Pending</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in purchases %}
+          <tr class="{% if p.amount|floatformat:2 - p.paid_amount|floatformat:2 > 0 %}table-warning{% endif %}">
+            <td>{{ p.party.name }}</td>
+            <td>{{ p.date }}</td>
+            <td class="text-start">{{ p.product }}</td>
+            <td>{{ p.qty }}</td>
+            <td>{{ p.rate }}</td>
+            <td class="fw-bold text-primary">{{ p.amount }}</td>
+            <td class="fw-bold text-success">{{ p.current_stock }}</td>
+            <td class="text-success">{{ p.paid_amount|default:0 }}</td>
+            <td class="text-danger fw-bold">{{ p.amount|floatformat:2|add:"0"|floatformat:2|floatval - p.paid_amount|floatformat:2|floatval }}</td>
+            <td>
+              <a href="{% url 'update_payment' p.id %}" class="btn btn-sm btn-success">💵 Update Payment</a>
+              <a href="{% url 'edit_purchase' p.id %}" class="btn btn-sm btn-warning">✏️ Edit</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="10" class="text-center text-muted">No records found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light fw-bold">
+        <tr>
+          <td colspan="3" class="text-end">Total:</td>
+          <td>{{ total_qty }}</td>
+          <td></td>
+          <td>{{ total_amount }}</td>
+          <td></td>
+          <td>{{ total_paid }}</td>
+          <td class="text-danger">{{ total_pending }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>

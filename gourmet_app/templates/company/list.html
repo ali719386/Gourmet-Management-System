@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Companies</h3>
+<a class="btn btn-sm btn-primary" href="/admin/gourmet_app/company/add/">Add Company (admin)</a>
+<ul class="list-group mt-2">
+  {% for c in companies %}<li class="list-group-item"><a href="{% url 'company_detail' c.pk %}">{{ c.name }}</a></li>{% empty %}<li class="list-group-item">No companies</li>{% endfor %}
+</ul>
+{% endblock %}

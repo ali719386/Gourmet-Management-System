@@ -1,0 +1,10 @@
+{% load static %}
+<div class="container mt-4">
+  <h4 class="text-warning mb-3">Edit Purchase - {{ purchase.product }}</h4>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-warning" type="submit">Save Changes</button>
+    <a href="{% url 'party_report' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>

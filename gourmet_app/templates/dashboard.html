@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid px-4 py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark">📊 Business Dashboard</h2>
+    <span class="text-muted">{{ today|date:"M d, Y" }}</span>
+  </div>
+
+  <!-- Row 1: Summary Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 text-center bg-light">
+        <h6 class="text-muted mb-1">Total Purchases</h6>
+        <p class="h4 fw-bold text-primary mb-0">{{ total_purchases }}</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 text-center bg-light">
+        <h6 class="text-muted mb-1">Total Sales</h6>
+        <p class="h4 fw-bold text-success mb-0">{{ total_sales }}</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 text-center bg-light">
+        <h6 class="text-muted mb-1">Expenses</h6>
+        <p class="h4 fw-bold text-danger mb-0">{{ total_expenses }}</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 text-center bg-light">
+        <h6 class="text-muted mb-1">Profit</h6>
+        <p class="h4 fw-bold text-dark mb-0">{{ profit }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Stock with Search + Pagination -->
+  <div class="row g-4">
+    <div class="col-lg-12">
+      <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title fw-bold text-dark mb-0">📦 Current Stock</h5>
+            <input id="searchInput" type="text" class="form-control w-auto" placeholder="🔍 Search product">
+          </div>
+
+          <div class="table-responsive">
+            <table id="stockTable" class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Product</th>
+                  <th class="text-center">Quantity</th>
+                  <th class="text-center">Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in stocks %}
+                  <tr>
+                    <td class="fw-semibold">{{ s.product }}</td>
+                    <td class="text-center">{{ s.quantity }}</td>
+                    <td class="text-center">
+                      {% if s.last_rate %}
+                        <span class="fw-bold text-dark">Rs {{ s.last_rate }}</span>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="text-center text-muted py-3">No stock available</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <button id="prevBtn" class="btn btn-outline-secondary btn-sm me-2">Previous</button>
+              <button id="nextBtn" class="btn btn-outline-secondary btn-sm">Next</button>
+            </div>
+            <div>
+              <select id="rowsPerPage" class="form-select form-select-sm w-auto">
+                <option value="5">5 rows</option>
+                <option value="10" selected>10 rows</option>
+                <option value="20">20 rows</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search + Pagination JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const table = document.getElementById("stockTable").getElementsByTagName("tbody")[0];
+  const searchInput = document.getElementById("searchInput");
+  const rowsPerPageSelect = document.getElementById("rowsPerPage");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let currentPage = 1;
+  let rowsPerPage = parseInt(rowsPerPageSelect.value);
+
+  function renderTable() {
+    const rows = Array.from(table.querySelectorAll("tr"));
+    const filter = searchInput.value.toLowerCase();
+
+    const filteredRows = rows.filter(row => {
+      return row.innerText.toLowerCase().includes(filter);
+    });
+
+    const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+    filteredRows.forEach((row, index) => {
+      row.style.display = "none";
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      if (index >= start && index < end) {
+        row.style.display = "";
+      }
+    });
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+  }
+
+  searchInput.addEventListener("input", () => {
+    currentPage = 1;
+    renderTable();
+  });
+
+  rowsPerPageSelect.addEventListener("change", () => {
+    rowsPerPage = parseInt(rowsPerPageSelect.value);
+    currentPage = 1;
+    renderTable();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentPage++;
+    renderTable();
+  });
+
+  renderTable();
+});
+</script>
+
+{% endblock %}

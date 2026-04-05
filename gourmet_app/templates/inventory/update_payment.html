@@ -1,0 +1,10 @@
+{% load static %}
+<div class="container mt-4">
+  <h4 class="text-primary mb-3">Update Payment for {{ purchase.party.name }}</h4>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success" type="submit">Update</button>
+    <a href="{% url 'party_report' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>

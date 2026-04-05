@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Company Header -->
+<div class="mb-5 text-center">
+  <h2 class="fw-bold" style="color:#3B82F6;">{{ company.name }}</h2>
+  <p class="text-muted">{{ company.address }}</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-5">
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-0 rounded-4 p-4 text-center" style="background:linear-gradient(135deg,#3B82F6,#60A5FA); color:#fff;">
+      <h6 class="fw-light">Total Purchase</h6>
+      <h3 class="fw-bold counter" data-target="{{ total_purchase|default:0 }}">0</h3>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-0 rounded-4 p-4 text-center" style="background:linear-gradient(135deg,#9333EA,#A855F7); color:#fff;">
+      <h6 class="fw-light">Total Payment</h6>
+      <h3 class="fw-bold counter" data-target="{{ total_payment|default:0 }}">0</h3>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="card shadow-sm border-0 rounded-4 p-4 text-center" style="background:linear-gradient(135deg,#EF4444,#F87171); color:#fff;">
+      <h6 class="fw-light">Pending Payment</h6>
+      <h3 class="fw-bold counter" data-target="{{ pending_payment|default:0 }}">0</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Purchases and Payments Cards -->
+<div class="row">
+  <!-- Purchases -->
+  <div class="col-lg-6 mb-4">
+    <div class="card shadow-sm border-0 rounded-4 h-100" style="background:#F0F9FF;">
+      <div class="card-body">
+        <h5 class="card-title fw-bold" style="color:#3B82F6;">📦 Purchases</h5>
+        <ul class="list-group list-group-flush">
+          {% for p in purchases %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-bold">{{ p.date }}</span> – {{ p.product }} (x{{ p.qty }})
+              </div>
+              <span class="badge bg-primary rounded-pill">@ {{ p.rate }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No purchases</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments -->
+  <div class="col-lg-6 mb-4">
+    <div class="card shadow-sm border-0 rounded-4 h-100" style="background:#F8F5FF;">
+      <div class="card-body">
+        <h5 class="card-title fw-bold" style="color:#9333EA;">💰 Payments</h5>
+        <ul class="list-group list-group-flush">
+          {% for pay in payments %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span>
+                <span class="fw-bold">{{ pay.date }}</span> – {{ pay.note }}
+              </span>
+              <span class="badge bg-success rounded-pill">{{ pay.amount }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No payments</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Payment Form -->
+<div class="card shadow-sm border-0 rounded-4 mb-4" style="background:#F9FAFB;">
+  <div class="card-body">
+    <h5 class="card-title fw-bold mb-3" style="color:#3B82F6;">➕ Add Payment</h5>
+    <form method="post">
+      {% csrf_token %}
+      <div class="row">
+        {% for field in form %}
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-bold">{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+      </div>
+      <button class="btn btn-primary shadow-sm" type="submit">💳 Add Payment</button>
+    </form>
+  </div>
+</div>
+
+<!-- Download PDF Button -->
+<div class="text-center mb-5">
+  <a class="btn btn-outline-primary shadow-sm" href="{% url 'company_payment_pdf' company.pk %}">
+    ⬇️ Download Payments PDF
+  </a>
+</div>
+
+<!-- JS for Counter Animations and Hover -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // counters
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+      const updateCount = () => {
+        const target = +counter.getAttribute('data-target');
+        const count = +counter.innerText;
+        const increment = target / 100;
+        if (count < target) {
+          counter.innerText = Math.ceil(count + increment);
+          setTimeout(updateCount, 15);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
+    });
+
+    // subtle hover
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-4px)';
+        card.style.transition = '0.3s ease';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
+
+{% endblock %}

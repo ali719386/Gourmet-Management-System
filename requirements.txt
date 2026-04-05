@@ -1,0 +1,15 @@
+# Gourmet Management System – saari use hone wali libraries
+# Install: pip install -r requirements.txt
+
+# Web framework (views, urls, models, forms, admin, auth)
+Django>=5.0
+
+# PDF banane ke liye (views: company payment PDF, quick sale invoice, sales report PDF)
+reportlab>=4.0
+
+# HTML se PDF (models.py / sales report PDF)
+xhtml2pdf>=0.2
+
+# Uername: alihasnain
+# Email address: alihasnain719386@gmail.com
+# Password: 00043

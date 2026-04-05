@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="mb-3">🧾 Parties</h3>
+
+    <!-- Add New Party Form -->
+    <div class="card mb-4 p-3 shadow-sm rounded">
+        <h5 class="mb-3">➕ Add New Party</h5>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-2">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+            </div>
+            <div class="mb-2">
+                {{ form.contact.label_tag }}
+                {{ form.contact }}
+            </div>
+            <div class="mb-2">
+                {{ form.address.label_tag }}
+                {{ form.address }}
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Add Party</button>
+        </form>
+    </div>
+
+    <!-- Existing Parties List -->
+    <ul class="list-group">
+        {% for party in parties %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ party.name }}
+            <a href="{% url 'party_ledger' party.id %}" class="btn btn-sm btn-outline-primary">View Ledger</a>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center text-muted">No parties found.</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
